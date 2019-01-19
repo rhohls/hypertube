@@ -43,12 +43,13 @@ function titleExtract(title){
 
 async function makeMovieList(torrents){
 	var movie_list = {};
+	var count = 1;
 
 	torrents.forEach(function(torrent_file){
 		movie_list.test = 1;
 
 		imdb.searchMovies(torrent_file['title'],
-		async function (movies) {
+			function (movies) {
 
 			movie = movies[0];
 			console.log(movie);
@@ -68,16 +69,26 @@ async function makeMovieList(torrents){
 				});
 			}
 
+
+			if (++count == torrents.length){
+			
+				res.send(movie_list);			--------- make this work
+				return (movie_list);
+
+			}
 			console.log("movie list: ", movie_list);
 			console.log("~~~~")
-			console.log("")
-
+			console.log("");
 		}, function(error) { 
 			console.error(error);
 		});
+		
+		// console.log(x);
+		console.log("counting: ", count, torrents.length);
+
 	});
 
-	return (movie_list);
+	//return (movie_list);
 };
 
 
@@ -134,7 +145,7 @@ router.get('/',
 
 
 
-	var list = (makeMovieList(torrents,res));
+	var list = await (makeMovieList(torrents,res));
 	// await Promise.all(list).then(console.log("my lis : ", list));	
 	console.log("---- final movie list: ", list);
 
