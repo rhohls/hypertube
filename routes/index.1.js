@@ -1,4 +1,3 @@
-require('../functions/genericfunctions');
 var db = require('../functions/create_db');
 var express = require('express');
 var router = express.Router();

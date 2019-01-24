@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var func = require('../functions/genericfunctions');
 
 /* GET home page. */
 

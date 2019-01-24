@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var con = require('../functions/db_conn.js');
 var path = require('path');
 var imdb = require('imdb-node-api');
 

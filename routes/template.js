@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var con = require('../functions/db_conn.js');
 
 
 /* GET home page. */
