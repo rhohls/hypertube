@@ -128,13 +128,17 @@ router.get('/video', function(req, res, next) {
 	var torrentStream = require('torrent-stream');
 	var pathing = path.join(__dirname + '/temp');
 	var options = {path: pathing}
-	console.log(pathing);
+	console.log('path: ', pathing);
 	// var engine = torrentStream('magnet:magnet:?xt=urn:btih:1374312275fa35813465a1fff36cb1178710d029&dn=&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopentor.org%3A2710&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Ftracker.blackunicorn.xyz%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969');
 	// var engine = torrentStream('magnet:?xt=urn:btih:72c83366e95dd44cc85f26198ecc55f0f4576ad4&dn=&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopentor.org%3A2710&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Ftracker.blackunicorn.xyz%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969');
-	var engine = torrentStream('magnet:?xt=urn:btih:8d7210eee5fbae2f35ad84779706d5626d0a34d8&dn=Black.Panther.2018.1080p.BluRay.H264.AAC-RARBG&tr=http%3A%2F%2Ftracker.trackerfix.com%3A80%2Fannounce&tr=udp%3A%2F%2F9.rarbg.me%3A2710&tr=udp%3A%2F%2F9.rarbg.to%3A2710&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce', options);
-
+	// var engine = torrentStream('magnet:?xt=urn:btih:8d7210eee5fbae2f35ad84779706d5626d0a34d8&dn=Black.Panther.2018.1080p.BluRay.H264.AAC-RARBG&tr=http%3A%2F%2Ftracker.trackerfix.com%3A80%2Fannounce&tr=udp%3A%2F%2F9.rarbg.me%3A2710&tr=udp%3A%2F%2F9.rarbg.to%3A2710&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce', options);
+	var engine = torrentStream('magnet:?xt=urn:btih:C45711FE49E45CF415B248FAC6B06BDEF1A160D1&dn=363088&tr=udp://open.demonii.com:1337/announce&tr=udp://tracker.openbittorrent.com:80', options);
 	engine.on('ready', function() {
+		console.log('ready');
+		console.log(files);
 		engine.files.forEach(function(file) {
+			console.log('filename:', file.name);
+			
 			if (file.name == 'Black.Panther.2018.1080p.BluRay.H264.AAC-RARBG.mp4'){
 			console.log('filename:', file.name);
 			// console.log('filepath:', file.path);
@@ -169,5 +173,45 @@ router.get('/video', function(req, res, next) {
 	});
 
 });
+
+
+router.get('/download', function(req, res, next) {
+
+	var torrentStream = require('torrent-stream');
+	var pathing = path.join(__dirname + '/temp');
+	var options = {path: pathing}
+	console.log('path: ', pathing);
+
+	var engine = torrentStream('magnet:?xt=urn:btih:8d7210eee5fbae2f35ad84779706d5626d0a34d8&dn=Black.Panther.2018.1080p.BluRay.H264.AAC-RARBG&tr=http%3A%2F%2Ftracker.trackerfix.com%3A80%2Fannounce&tr=udp%3A%2F%2F9.rarbg.me%3A2710&tr=udp%3A%2F%2F9.rarbg.to%3A2710&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce', options);
+	// var engine = torrentStream('magnet:?xt=urn:btih:C45711FE49E45CF415B248FAC6B06BDEF1A160D1&dn=363088&tr=udp://open.demonii.com:1337/announce&tr=udp://tracker.openbittorrent.com:80', options);
+	let name = 'testfile';
+	let ext = '.mp4';
+	let sub = -1;
+	engine.on('ready', function() {
+        engine.files = engine.files.sort(function (a, b) {
+            return b.length - a.length
+		})
+		
+		
+
+        let file = (sub != -1 ) ? engine.files[sub] : engine.files[0];
+		// let file = engine.files[0];
+		console.log(file.name);
+        // let videoStream = file.createReadStream();
+        // if (sub == -1) {
+        //     let filePath = path.join(__dirname, '../public/videos/'+name+ext);
+        //     let fileStream = fs.createWriteStream(filePath);
+        //     videoStream.pipe(fileStream);
+        // } else {
+        //     videoStream.pipe(srt2vtt()).pipe(fs.createWriteStream(path.join(__dirname, '../public/videos/'+name+'.vtt')));
+        // }
+    });
+	res.sendFile(path.join(__dirname + '/index2.html'));
+
+});
+
+
+
+
 
 module.exports = router;

@@ -5,29 +5,6 @@ var path = require('path');
 var imdb = require('imdb-node-api');
 
 
-async function getResults(){
-
-	const TorrentSearchApi = require('torrent-search-api');
-	
-	TorrentSearchApi.enableProvider('1337x');
-
-	var res = await TorrentSearchApi.search('brooklyn', 'Movies', 20);
-
-	
-	res.forEach(function(torrent){
-		torrent['title'] = torrent['title'].match(/[^([]*/);		
-	});
-
-	console.log("tor:", res);
-	
-	return (res);
-
-}
-
-
-
-
-
 
 function titleExtract(title){
 	let bracket_match = title.match(/(.*?)[^(](\d\d\d\d)[^p]/);
@@ -46,45 +23,31 @@ async function makeMovieList(torrents){
 	var count = 1;
 
 	torrents.forEach(function(torrent_file){
-		movie_list.test = 1;
 
 		imdb.searchMovies(torrent_file['title'],
 			function (movies) {
 
 			movie = movies[0];
-			console.log(movie);
-			console.log("------")
-			console.log("")
 
 			// if movie in list check which is bigger seeds
 			if (! (movie['id'] in movie_list) ||
 				((movie['id'] in movie_list) && torrent_file['seeds'] > 
 												movie_list[movie['id']]['torrent']['seeds'])
 			){
-				console.log('     -   adding       -')
 				movie_list[movie['id']] = ({
-				// movie_list[movie['id']] = new Promise({
 					video : movie ,
 					torrent : torrent_file
 				});
 			}
 
-
+			// when done log list
 			if (++count == torrents.length){
-			
-				res.send(movie_list);			--------- make this work
-				return (movie_list);
-
+				console.log("finaly here -------", movie_list);
 			}
-			console.log("movie list: ", movie_list);
-			console.log("~~~~")
-			console.log("");
+
 		}, function(error) { 
 			console.error(error);
 		});
-		
-		// console.log(x);
-		console.log("counting: ", count, torrents.length);
 
 	});
 
@@ -94,28 +57,14 @@ async function makeMovieList(torrents){
 
 
 
+function getMovieInfo(movie_id, res){
+	imdb.getMovie(movie_id, function (movie) {
+		console.log("test movie");
 
-// function makeMovieList(torrents){
-// 	var movie_list = {};
+		// res.send(movie);
+		// res.json(movie);
+		// return (movie);
 
-// 	torrents.forEach(function(torrent_file){
-// 		imdb.searchMovies(torrent_file['title'], logMovie(movie), logError(err))
-// 	});
-
-// 	return (movie_list);
-// }
-
-// function logMovie(movie){
-// 	console.log(movie);
-// }
-
-// function logError(err){
-// 	console.log(err);
-// }
-
-function getMovieInfo(movie_id){
-	imdb.getMovie('tt4908174', function (movie) {
-		console.log("test moie");
 		console.log(movie);
 	}, function(error) { 
 		console.error(error);
@@ -129,10 +78,13 @@ router.get('/',
 	async function(req, res, next) {
 	
 	console.log('start');
+
+	let search_phrase = '2018'
+	
 	// torrent fetch
 	const TorrentSearchApi = require('torrent-search-api');
 	TorrentSearchApi.enableProvider('1337x');
-	const torrents = await TorrentSearchApi.search('brooklyn', 'Movies', 5);
+	const torrents = await TorrentSearchApi.search(search_phrase, 'Movies', 5);
 
 	// scraping tittles
 	torrents.forEach(function(torrent_file){
@@ -140,7 +92,7 @@ router.get('/',
 		let new_title = (titleExtract(torrent_file['title']));
 		torrent_file['title'] = new_title;
 	});
-	console.log("torrntes", torrents);
+	// console.log("torrntes", torrents);
 
 
 
@@ -148,19 +100,6 @@ router.get('/',
 	var list = await (makeMovieList(torrents,res));
 	// await Promise.all(list).then(console.log("my lis : ", list));	
 	console.log("---- final movie list: ", list);
-
-
-
-
-	let test_id = 'tt4908174'
-
-	var movie_info = getMovieInfo(test_id);
-	console.log(movie_info);
-
-
-
-	//res.send(JSON.stringify({}));
-
 
 
 	res.sendFile(path.join(__dirname + '/index2.html'));

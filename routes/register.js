@@ -5,6 +5,9 @@ var func = require('../functions/genericfunctions');
 /* GET home page. */
 
 router.get('/', function(req, res, next) {
+
+
+	
 	res.render('register', {test : "nothing sent"});
 });
 
