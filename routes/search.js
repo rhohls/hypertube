@@ -3,6 +3,7 @@ var router = express.Router();
 var path = require('path');
 var imdb = require('imdb-node-api');
 
+var TorrentSearchApi = require('torrent-search-api');
 
 
 function titleExtract(title){
@@ -23,12 +24,11 @@ async function makeMovieList(torrents){
 
 	torrents.forEach(function(torrent_file){
 
-		imdb.searchMovies(torrent_file['title'],
-			function (movies) {
+		imdb.searchMovies(torrent_file['title'], async function (movies) {
 
 			movie = movies[0];
 
-			// if movie in list check which is bigger seeds
+			// if movie in list, check which is bigger seeds
 			if (! (movie['id'] in movie_list) ||
 				((movie['id'] in movie_list) && torrent_file['seeds'] > 
 												movie_list[movie['id']]['torrent']['seeds'])
@@ -39,7 +39,7 @@ async function makeMovieList(torrents){
 				});
 			}
 
-			// when done log list
+			// when done making list: log list
 			if (++count == torrents.length){
 				console.log("finaly here -------", movie_list);
 			}
@@ -47,10 +47,7 @@ async function makeMovieList(torrents){
 		}, function(error) { 
 			console.error(error);
 		});
-
 	});
-
-	//return (movie_list);
 };
 
 
@@ -81,15 +78,17 @@ router.get('/',
 	let search_phrase = '2018'
 	
 	// torrent fetch
-	const TorrentSearchApi = require('torrent-search-api');
 	TorrentSearchApi.enableProvider('1337x');
 	const torrents = await TorrentSearchApi.search(search_phrase, 'Movies', 5);
 
 	// scraping tittles
-	torrents.forEach(function(torrent_file){
+	torrents.forEach(async function(torrent_file){
 		// console.log( torrent_file['title']);
 		let new_title = (titleExtract(torrent_file['title']));
 		torrent_file['title'] = new_title;
+		const magnet = await TorrentSearchApi.getMagnet(torrent_file);
+		// console.log('magnet: ', torrent_file['title'], ' link: ', magnet);
+		torrent_file['magnet'] = magnet;
 	});
 	// console.log("torrntes", torrents);
 
