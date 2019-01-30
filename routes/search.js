@@ -28,8 +28,16 @@ async function makeMovieList(torrents){
 
 			movie = movies[0];
 
+			// add first movie -- console warnings
+			if (count == 1){
+				movie_list[movie['id']] = ({
+					video : movie ,
+					torrent : torrent_file
+				});
+			}
+			
 			// if movie in list, check which is bigger seeds
-			if (! (movie['id'] in movie_list) ||
+			else if (! (movie['id'] in movie_list) ||
 				((movie['id'] in movie_list) && torrent_file['seeds'] > 
 												movie_list[movie['id']]['torrent']['seeds'])
 			){
@@ -51,35 +59,17 @@ async function makeMovieList(torrents){
 };
 
 
-
-
-function getMovieInfo(movie_id, res){
-	imdb.getMovie(movie_id, function (movie) {
-		console.log("test movie");
-
-		// res.send(movie);
-		// res.json(movie);
-		// return (movie);
-
-		console.log(movie);
-	}, function(error) { 
-		console.error(error);
-	});
-}
-
-
-/* GET home page. */
 router.get('/', 
 
 	async function(req, res, next) {
 	
 	console.log('start');
 
-	let search_phrase = '2018'
+	let search_phrase = '2019'
 	
 	// torrent fetch
 	TorrentSearchApi.enableProvider('1337x');
-	const torrents = await TorrentSearchApi.search(search_phrase, 'Movies', 5);
+	const torrents = await TorrentSearchApi.search(search_phrase, 'Movies', 10);
 
 	// scraping tittles
 	torrents.forEach(async function(torrent_file){
@@ -103,7 +93,6 @@ router.get('/',
 	res.sendFile(path.join(__dirname + '/index2.html'));
 	// res.render('index', { title: 'Best website' });	
 });
-
 
 
 

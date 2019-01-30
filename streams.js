@@ -16,11 +16,13 @@ function cStream(stream, extension, res) {
 		.outputFormat('mp4')
 		.output(res)
 		.on('error', (err, stdout, stderr) => {	});
-		converter.inputFormat(extension.substr(1))
+        
+        converter.inputFormat(extension.substr(1))
 		.audioCodec('aac')
 		.videoCodec('libx264')
 		.run();
-		res.on('close', () => {
+        
+        res.on('close', () => {
 			converter.kill();
 		});
 	} catch(e) {
